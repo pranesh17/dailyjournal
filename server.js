@@ -7,11 +7,11 @@ const mysql = require('mysql');
 const fileUpload = require('express-fileupload');
 const AWS = require('aws-sdk');
 require('dotenv').config()
-
+// AWS.config.update({
+//     accessKeyId: "<Access Key Here>",
+//     secretAccessKey: "<Secret Access Key Here>"
+//   });
 const s3 = new AWS.S3( );
-//adding configure here ??
-//AWS.config.update({region: 'us-west-2'});  https://docs.aws.amazon.com/sdk-for-javascript/v2/developer-guide/loading-node-credentials-shared.html
-
 const app = express();
 app.set('view engine', 'ejs');
 app.use(bodyParser.urlencoded({extended: true}));
@@ -189,7 +189,7 @@ app.get("/day/:id", function(req, res){
   });
 });
 
-
-app.listen(3000, function() {
+const port=process.env.port || 3000;
+app.listen(port, function() {
   console.log("Server started on port 3000");
 });
