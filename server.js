@@ -6,11 +6,9 @@ const _ = require("lodash");
 const mysql = require('mysql');
 const fileUpload = require('express-fileupload');
 const AWS = require('aws-sdk');
+var md5 = require('md5');
 require('dotenv').config()
-// AWS.config.update({
-//     accessKeyId: "<Access Key Here>",
-//     secretAccessKey: "<Secret Access Key Here>"
-//   });
+
 const s3 = new AWS.S3( );
 const app = express();
 app.set('view engine', 'ejs');
@@ -34,7 +32,9 @@ connection.connect(function(err) {
   console.log('Connected to RDS.');
 });
 connection.query("use diary;", function(err, result , fields) {
-  if (err) throw err;
+  if (err) {
+    throw err;
+  }
 });
 
 
@@ -56,19 +56,35 @@ app.get("/register", (req,res)=>{
 app.post("/register", (req, res) => {
   var Email = req.body.email;
   var Name = req.body.name;
-  var password = req.body.password;
-  var sql = "INSERT INTO users (Email, Name, Password ) VALUES('"+Email+"','"+Name+"','"+ password+"');"
-  console.log(sql);
-  connection.query(sql, function(err, result) {
-   if (err){
-     throw err;
-     res.render("error", {
-       Error: "Registration error",
-       });
-   }
-   else
-   {
-     res.render("registerresponce");
+  var password = md5(req.body.password);
+  var sql = "INSERT INTO users (Email, Name, Password ) VALUES('"+Email+"','"+Name+"','"+ password+"');";
+  var sql1= "select UserID from users where email='"+Email+"';";
+  connection.query(sql1, function(err, result) {
+    if (err) {
+        throw err;
+        console.log(err);
+    }
+    else
+    {
+      if(result[0] == null){
+         connection.query(sql, function(err, result) {
+            if (err){
+              throw err;
+              res.render("error", {
+                Error: "Registration error",
+              });
+             }
+            else
+              {
+                res.render("registerresponce");
+              }
+          });
+      }
+      else{
+          res.render("error", {
+            Error: "User already exists error",
+          });
+      }
     }
   });
 });
@@ -79,7 +95,7 @@ app.get("/login", (req,res)=>{
 
 app.post("/login", (req, res) => {
   var Email = req.body.email;
-  var password = req.body.password;
+  var password = md5(req.body.password);
   var sql= "select * from users where email='"+Email+"';"
   connection.query(sql, function(err, result) {
     if (err) {
