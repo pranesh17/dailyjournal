@@ -8,6 +8,7 @@ const fileUpload = require('express-fileupload');
 const AWS = require('aws-sdk');
 var md5 = require('md5');
 require('dotenv').config()
+const https = require('https');
 
 const s3 = new AWS.S3( );
 const app = express();
@@ -38,12 +39,30 @@ connection.query("use diary;", function(err, result , fields) {
 });
 
 
+
 var userid=1;  //for storing userid and name of current user
 var name=0;
 
 app.get("/", (req,res)=>{
-  res.render("landing");
+  today = new Date();
+  var date = today.getDate();
+  var time = today.getHours();
+  const url="https://fv58rvph00.execute-api.us-east-1.amazonaws.com/first?date="+time;
+  https.get(url,function(response){
+     response.on("data",function(data){
+        const info=JSON.parse(data);
+        res.render("landing1",{
+              Quote:info.quote,
+              Author:info.author
+        });
+     });
+  });
 });
+
+// app.get("/", (req,res)=>{
+//   res.render("landing");
+// });
+
 app.get("/logout", (req,res)=>{
   var userid=1;
   res.render("landing");
