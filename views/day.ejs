@@ -1,11 +1,11 @@
 <%- include("partials/header"); -%>
-
-<div class="dayitem">
-  <h1><%=title%></h1>
-  <p><%=content%></p>
-  <img src=<%=piclink%> alt="no picture found"/>
-</div>
-
+  <div class="dayitem">
+    <h1><%=title%></h1>
+    <p><%=content%></p>
+    <img src=<%=piclink%> alt="no picture found"/>
+     <br>
+     <a style="margin-top:9px;" class="btn btn-danger" href="/delete/<%=postID%>">Delete this post</a>
+  </div>
 
 
 <%- include("partials/footer"); -%>

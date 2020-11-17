@@ -43,25 +43,25 @@ connection.query("use diary;", function(err, result , fields) {
 var userid=1;  //for storing userid and name of current user
 var name=0;
 
-app.get("/", (req,res)=>{
-  today = new Date();
-  var date = today.getDate();
-  var time = today.getHours();
-  const url="https://fv58rvph00.execute-api.us-east-1.amazonaws.com/first?date="+time;
-  https.get(url,function(response){
-     response.on("data",function(data){
-        const info=JSON.parse(data);
-        res.render("landing1",{
-              Quote:info.quote,
-              Author:info.author
-        });
-     });
-  });
-});
-
 // app.get("/", (req,res)=>{
-//   res.render("landing");
+//   today = new Date();
+//   var date = today.getDate();
+//   var time = today.getHours();
+//   const url="https://fv58rvph00.execute-api.us-east-1.amazonaws.com/first?date="+time;
+//   https.get(url,function(response){
+//      response.on("data",function(data){
+//         const info=JSON.parse(data);
+//         res.render("landing1",{
+//               Quote:info.quote,
+//               Author:info.author
+//         });
+//      });
+//   });
 // });
+
+app.get("/", (req,res)=>{
+  res.render("landing");
+});
 
 app.get("/logout", (req,res)=>{
   var userid=1;
@@ -216,6 +216,7 @@ app.get("/day/:id", function(req, res){
    else
    {
      res.render("day", {
+       postID :req.params.id,
        title: result[0].Title,
        content:result[0].content,
        piclink:result[0].Piclink
@@ -223,6 +224,23 @@ app.get("/day/:id", function(req, res){
     }
   });
 });
+
+app.get("/delete/:id", function(req, res){
+  console.log(req.params.id);
+  connection.query("delete from posts where postid="+req.params.id+";", function(err, result) {
+   if (err){
+     throw err;
+     res.render("error", {
+       Error: " Deleting error",
+       });
+   }
+   else
+   {
+     res.redirect("/home");
+    }
+  });
+});
+
 
 const port=process.env.port || 3000;
 app.listen(port, function() {
